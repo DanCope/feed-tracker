@@ -535,9 +535,9 @@ F5-S1 (amount input) can start in parallel with F4. F5-S2 needs the timer (F4-S1
 
 **Definition of Done:**
 
-- [ ] Can log a nappy change with poop and pee scale
-- [ ] Log appears in Google Sheet with correct data
-- [ ] Logging takes under 5 seconds
+- [x] Can log a nappy change with poop and pee scale
+- [x] Log appears in Google Sheet with correct data
+- [x] Logging takes under 5 seconds
 
 ### Stories
 
@@ -551,12 +551,12 @@ F5-S1 (amount input) can start in parallel with F4. F5-S2 needs the timer (F4-S1
 
 **Acceptance Criteria:**
 
-- [ ] Component shows 4 tappable options: None, Small, Medium, Large
-- [ ] Options are visually distinct (size, color, or emoji)
-- [ ] Selected option is highlighted; only one can be selected
-- [ ] Defaults to "None" (pre-selected)
-- [ ] Component exposes selected value as a bindable string
-- [ ] Label prop to distinguish "Poop" vs "Pee" usage
+- [x] Component shows 4 tappable options: None, Small, Medium, Large
+- [x] Options are visually distinct (size, color, or emoji)
+- [x] Selected option is highlighted; only one can be selected
+- [x] Defaults to "None" (pre-selected)
+- [x] Component exposes selected value as a bindable string
+- [x] Label prop to distinguish "Poop" vs "Pee" usage
 
 **Technical Notes:** Four large buttons in a row. Consider emoji: 💩 for poop scale, 💧 for pee scale. Or simple colored squares that grow in size. Keep it visual — no text needed to understand the scale.
 
@@ -576,11 +576,11 @@ F5-S1 (amount input) can start in parallel with F4. F5-S2 needs the timer (F4-S1
 
 **Acceptance Criteria:**
 
-- [ ] Screen shows: Poop scale selector → Pee scale selector → Save
-- [ ] Both default to "None" — can save immediately if it's a dry nappy (still worth logging)
-- [ ] "Save" submits: user, type ("nappy"), poop, pee
-- [ ] Uses shared SubmitFeedback component
-- [ ] No timer — this is intentionally the fastest screen
+- [x] Screen shows: Poop scale selector → Pee scale selector → Save
+- [x] Both default to "None" — can save immediately if it's a dry nappy (still worth logging)
+- [x] "Save" submits: user, type ("nappy"), poop, pee
+- [x] Uses shared SubmitFeedback component
+- [x] No timer — this is intentionally the fastest screen
 
 **Technical Notes:** Route: `src/routes/nappy-change/+page.svelte`. Two ScaleSelector instances with different labels. Simplest screen in the app.
 
