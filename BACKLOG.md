@@ -31,10 +31,10 @@
 
 **Definition of Done:**
 
-- [ ] SvelteKit project builds with static adapter
-- [ ] Tailwind CSS and vite-plugin-pwa configured
-- [ ] GitHub Actions deploys to Pages on push to main
-- [ ] Placeholder page visible at the GitHub Pages URL
+- [x] SvelteKit project builds with static adapter
+- [x] Tailwind CSS and vite-plugin-pwa configured
+- [x] GitHub Actions deploys to Pages on push to main
+- [x] Placeholder page visible at the GitHub Pages URL
 
 ### Stories
 
@@ -48,13 +48,13 @@
 
 **Acceptance Criteria:**
 
-- [ ] SvelteKit project created with TypeScript and Svelte 5
-- [ ] `@sveltejs/adapter-static` installed and configured in `svelte.config.js`
-- [ ] Tailwind CSS v4 installed and working (utility classes render correctly)
-- [ ] `vite-plugin-pwa` installed and configured in `vite.config.ts` with basic manifest (name, icons placeholder, display: standalone)
-- [ ] `+layout.ts` exports `prerender = true` for static generation
-- [ ] `pnpm build` produces a static site in `build/`
-- [ ] Base path configured for GitHub Pages project site
+- [x] SvelteKit project created with TypeScript and Svelte 5
+- [x] `@sveltejs/adapter-static` installed and configured in `svelte.config.js`
+- [x] Tailwind CSS v4 installed and working (utility classes render correctly)
+- [x] `vite-plugin-pwa` installed and configured in `vite.config.ts` with basic manifest (name, icons placeholder, display: standalone)
+- [x] `+layout.ts` exports `prerender = true` for static generation
+- [x] `pnpm build` produces a static site in `build/`
+- [x] Base path configured for GitHub Pages project site
 
 **Technical Notes:** Use `pnpm create svelte@latest`. Static adapter needs `fallback: undefined` (no SPA fallback — all routes prerendered). Base path set via `kit.paths.base` in svelte config.
 
@@ -74,10 +74,10 @@
 
 **Acceptance Criteria:**
 
-- [ ] `.github/workflows/deploy.yml` triggers on push to `main`
-- [ ] Workflow installs deps, builds, and deploys to GitHub Pages using `actions/deploy-pages`
-- [ ] GitHub Pages source is set to GitHub Actions (not branch)
-- [ ] `.nojekyll` file included in build output
+- [x] `.github/workflows/deploy.yml` triggers on push to `main`
+- [x] Workflow installs deps, builds, and deploys to GitHub Pages using `actions/deploy-pages`
+- [x] GitHub Pages source is set to GitHub Actions (not branch)
+- [x] `.nojekyll` file included in build output
 
 **Technical Notes:** Use `actions/configure-pages`, `actions/upload-pages-artifact`, `actions/deploy-pages`. Pnpm needs corepack enable step.
 
@@ -97,9 +97,9 @@
 
 **Acceptance Criteria:**
 
-- [ ] Push to main triggers a successful GitHub Actions run
-- [ ] Placeholder page ("Feed Tracker" heading) is visible at `https://<user>.github.io/<repo>/`
-- [ ] No console errors, base path resolves correctly
+- [x] Push to main triggers a successful GitHub Actions run
+- [x] Placeholder page ("Feed Tracker" heading) is visible at `https://<user>.github.io/<repo>/`
+- [x] No console errors, base path resolves correctly
 
 **Technical Notes:** Smoke test — just verify the pipeline. Fix any base path or build issues before moving on.
 
@@ -130,10 +130,10 @@ Linear: S1 → S2 → S3. No parallelism within this feature, but the entire fea
 
 **Definition of Done:**
 
-- [ ] Google Sheet exists with correct column headers
-- [ ] Apps Script `doPost` accepts JSON, validates secret, appends row
-- [ ] Web app deployed and responds to external POST requests
-- [ ] Sheet is restricted to your Google accounts (not publicly shared)
+- [x] Google Sheet exists with correct column headers
+- [x] Apps Script `doPost` accepts JSON, validates secret, appends row
+- [x] Web app deployed and responds to external POST requests
+- [x] Sheet is restricted to your Google accounts (not publicly shared)
 
 ### Stories
 
@@ -147,10 +147,10 @@ Linear: S1 → S2 → S3. No parallelism within this feature, but the entire fea
 
 **Acceptance Criteria:**
 
-- [ ] Google Sheet created with columns: Timestamp, User, Type, Side, Duration (seconds), Amount Before (ml), Amount After (ml), Poop, Pee, Notes
-- [ ] Header row frozen
-- [ ] Sheet shared with both parents' Google accounts (edit access)
-- [ ] Sheet is NOT publicly shared (link sharing off)
+- [x] Google Sheet created with columns: Timestamp, User, Type, Side, Duration (seconds), Amount Before (ml), Amount After (ml), Poop, Pee, Notes
+- [x] Header row frozen
+- [x] Sheet shared with both parents' Google accounts (edit access)
+- [x] Sheet is NOT publicly shared (link sharing off)
 
 **Technical Notes:** Manual step — no code. Consider adding data validation dropdowns on Type (breast/bottle/nappy) and Poop/Pee columns for manual entry.
 
@@ -170,12 +170,12 @@ Linear: S1 → S2 → S3. No parallelism within this feature, but the entire fea
 
 **Acceptance Criteria:**
 
-- [ ] `doPost(e)` parses JSON from request body
-- [ ] Rejects requests where `secret` field doesn't match hardcoded key (returns 403-like JSON error)
-- [ ] Appends a row with: current timestamp (server-side), user, type, side, duration, amount_before, amount_after, poop, pee, notes
-- [ ] Returns JSON `{ "status": "ok" }` on success
-- [ ] Returns JSON `{ "status": "error", "message": "..." }` on failure
-- [ ] Handles missing/optional fields gracefully (blank cells, not errors)
+- [x] `doPost(e)` parses JSON from request body
+- [x] Rejects requests where `secret` field doesn't match hardcoded key (returns 403-like JSON error)
+- [x] Appends a row with: current timestamp (server-side), user, type, side, duration, amount_before, amount_after, poop, pee, notes
+- [x] Returns JSON `{ "status": "ok" }` on success
+- [x] Returns JSON `{ "status": "error", "message": "..." }` on failure
+- [x] Handles missing/optional fields gracefully (blank cells, not errors)
 
 **Technical Notes:** Use `SpreadsheetApp.getActiveSpreadsheet().getActiveSheet().appendRow([...])`. Timestamp should be server-generated (`new Date()`) for consistency. Parse with `JSON.parse(e.postData.contents)`.
 
@@ -195,11 +195,11 @@ Linear: S1 → S2 → S3. No parallelism within this feature, but the entire fea
 
 **Acceptance Criteria:**
 
-- [ ] Apps Script deployed as web app (Execute as: Me, Access: Anyone)
-- [ ] POST request via curl or Postman with valid secret returns `{ "status": "ok" }`
-- [ ] Row appears in sheet with correct data
-- [ ] POST with invalid secret returns error JSON
-- [ ] Web app URL documented (saved to project config or env)
+- [x] Apps Script deployed as web app (Execute as: Me, Access: Anyone)
+- [x] POST request via curl or Postman with valid secret returns `{ "status": "ok" }`
+- [x] Row appears in sheet with correct data
+- [x] POST with invalid secret returns error JSON
+- [x] Web app URL documented (saved to project config or env)
 
 **Technical Notes:** Deploy → New deployment → Web app. "Anyone" access means no Google sign-in required from the client. The `secret` field is the only guard. Note the URL — the frontend needs it.
 
@@ -231,10 +231,10 @@ Linear: S1 → S2 → S3. Entire feature runs in parallel with F1. The endpoint 
 
 **Definition of Done:**
 
-- [ ] App has a header with title and user toggle
-- [ ] Home screen shows 3 large, tappable navigation buttons
-- [ ] User selection persists across sessions
-- [ ] API service module can POST to Apps Script and handle responses
+- [x] App has a header with title and user toggle
+- [x] Home screen shows 3 large, tappable navigation buttons
+- [x] User selection persists across sessions
+- [x] API service module can POST to Apps Script and handle responses
 
 ### Stories
 
@@ -248,11 +248,11 @@ Linear: S1 → S2 → S3. Entire feature runs in parallel with F1. The endpoint 
 
 **Acceptance Criteria:**
 
-- [ ] Root layout renders a header bar with app title ("Feed Tracker")
-- [ ] Header has a slot/area for the user toggle (implemented in F3-S2)
-- [ ] Main content area fills remaining viewport height
-- [ ] Mobile-first styling — full-width, large text, comfortable spacing
-- [ ] Viewport meta tag set for mobile (`width=device-width, initial-scale=1`)
+- [x] Root layout renders a header bar with app title ("Feed Tracker")
+- [x] Header has a slot/area for the user toggle (implemented in F3-S2)
+- [x] Main content area fills remaining viewport height
+- [x] Mobile-first styling — full-width, large text, comfortable spacing
+- [x] Viewport meta tag set for mobile (`width=device-width, initial-scale=1`)
 
 **Technical Notes:** `src/routes/+layout.svelte`. Use Tailwind for layout. Header is fixed/sticky so it's always visible.
 
@@ -272,11 +272,11 @@ Linear: S1 → S2 → S3. Entire feature runs in parallel with F1. The endpoint 
 
 **Acceptance Criteria:**
 
-- [ ] Toggle component shows "Mum" and "Dad" as tappable options
-- [ ] Selected user is visually highlighted
-- [ ] Selection persists to `localStorage` and survives app restart
-- [ ] Default is "Mum" on first launch (arbitrary — just needs a default)
-- [ ] Component exposes the current user as a readable value for other components
+- [x] Toggle component shows "Mum" and "Dad" as tappable options
+- [x] Selected user is visually highlighted
+- [x] Selection persists to `localStorage` and survives app restart
+- [x] Default is "Mum" on first launch (arbitrary — just needs a default)
+- [x] Component exposes the current user as a readable value for other components
 
 **Technical Notes:** Svelte 5 store or context. `localStorage.getItem('user')` on mount, `localStorage.setItem('user', value)` on change. Keep it simple — two buttons in the header.
 
@@ -296,11 +296,11 @@ Linear: S1 → S2 → S3. Entire feature runs in parallel with F1. The endpoint 
 
 **Acceptance Criteria:**
 
-- [ ] Home screen displays 3 large buttons: "Breast Feed", "Bottle Feed", "Nappy Change"
-- [ ] Each button navigates to its respective log screen
-- [ ] Buttons are large enough to tap one-handed on a phone (minimum 48px height, ideally much larger)
-- [ ] Visual distinction between buttons (icons or color-coding)
-- [ ] Page is the default route (`/`)
+- [x] Home screen displays 3 large buttons: "Breast Feed", "Bottle Feed", "Nappy Change"
+- [x] Each button navigates to its respective log screen
+- [x] Buttons are large enough to tap one-handed on a phone (minimum 48px height, ideally much larger)
+- [x] Visual distinction between buttons (icons or color-coding)
+- [x] Page is the default route (`/`)
 
 **Technical Notes:** SvelteKit file routing: `src/routes/+page.svelte` for home, `src/routes/breast-feed/+page.svelte`, etc. Use `<a>` tags with `href` for navigation (SvelteKit handles client-side routing). Consider emoji as quick icons: 🤱 🍼 🧷
 
@@ -320,12 +320,12 @@ Linear: S1 → S2 → S3. Entire feature runs in parallel with F1. The endpoint 
 
 **Acceptance Criteria:**
 
-- [ ] `api.ts` module exports a `submitLog(data)` function
-- [ ] Function POSTs JSON to the Apps Script web app URL
-- [ ] Includes the shared secret in the payload
-- [ ] Returns a typed result: `{ success: true }` or `{ success: false, message: string }`
-- [ ] Apps Script URL and secret are stored in environment config (not hardcoded in components)
-- [ ] Handles network errors gracefully (try/catch, timeout)
+- [x] `api.ts` module exports a `submitLog(data)` function
+- [x] Function POSTs JSON to the Apps Script web app URL
+- [x] Includes the shared secret in the payload
+- [x] Returns a typed result: `{ success: true }` or `{ success: false, message: string }`
+- [x] Apps Script URL and secret are stored in environment config (not hardcoded in components)
+- [x] Handles network errors gracefully (try/catch, timeout)
 
 **Technical Notes:** Use `fetch()`. Apps Script URL goes in a `.env` file or a config module (no real secrets — it's a static site, the values will be in the bundle. The secret just stops random bots). Consider a `$lib/config.ts` that reads from `import.meta.env` or has hardcoded values.
 
@@ -356,10 +356,10 @@ F3-S1 first (layout). Then F3-S2 and F3-S3 can be parallel (both slot into the l
 
 **Definition of Done:**
 
-- [ ] Can log a breast feed with side and duration
-- [ ] Log appears in Google Sheet with correct data
-- [ ] Timer works reliably (start, stop, displays elapsed time)
-- [ ] Success/error feedback shown to user
+- [x] Can log a breast feed with side and duration
+- [x] Log appears in Google Sheet with correct data
+- [x] Timer works reliably (start, stop, displays elapsed time)
+- [x] Success/error feedback shown to user
 
 ### Stories
 
@@ -373,12 +373,12 @@ F3-S1 first (layout). Then F3-S2 and F3-S3 can be parallel (both slot into the l
 
 **Acceptance Criteria:**
 
-- [ ] Timer component displays elapsed time as `mm:ss`
-- [ ] "Start" button begins the timer; button changes to "Stop"
-- [ ] "Stop" button pauses the timer; button changes to "Start" (resume) with a "Done" option
-- [ ] Timer exposes elapsed seconds as a bindable/readable value
-- [ ] Timer visually indicates when running (e.g., pulsing dot, color change)
-- [ ] Timer handles screen lock / background gracefully (uses wall-clock diff, not `setInterval` counting)
+- [x] Timer component displays elapsed time as `mm:ss`
+- [x] "Start" button begins the timer; button changes to "Stop"
+- [x] "Stop" button pauses the timer; button changes to "Start" (resume) with a "Done" option
+- [x] Timer exposes elapsed seconds as a bindable/readable value
+- [x] Timer visually indicates when running (e.g., pulsing dot, color change)
+- [x] Timer handles screen lock / background gracefully (uses wall-clock diff, not `setInterval` counting)
 
 **Technical Notes:** Track `startTime = Date.now()` on start, calculate elapsed as `Date.now() - startTime` on each tick (via `setInterval` for display only). This survives phone sleep. Svelte 5: use `$state` for running/elapsed, `$effect` for the interval.
 
@@ -398,14 +398,14 @@ F3-S1 first (layout). Then F3-S2 and F3-S3 can be parallel (both slot into the l
 
 **Acceptance Criteria:**
 
-- [ ] Screen shows Left / Right toggle (large, tappable buttons)
-- [ ] Default: no side selected (must pick one before saving)
-- [ ] Timer component embedded — can start/stop during the feed
-- [ ] "Save" button submits: user (from toggle), type ("breast"), side, duration (seconds)
-- [ ] Save button disabled until side is selected and timer has been started then stopped
-- [ ] On successful save: show confirmation (e.g., green checkmark, "Logged!"), then return to home after 1–2 seconds
-- [ ] On error: show error message with "Try Again" option
-- [ ] Loading state while request is in flight (button disabled, spinner)
+- [x] Screen shows Left / Right toggle (large, tappable buttons)
+- [x] Default: no side selected (must pick one before saving)
+- [x] Timer component embedded — can start/stop during the feed
+- [x] "Save" button submits: user (from toggle), type ("breast"), side, duration (seconds)
+- [x] Save button disabled until side is selected and timer has been started then stopped
+- [x] On successful save: show confirmation (e.g., green checkmark, "Logged!"), then return to home after 1–2 seconds
+- [x] On error: show error message with "Try Again" option
+- [x] Loading state while request is in flight (button disabled, spinner)
 
 **Technical Notes:** Route: `src/routes/breast-feed/+page.svelte`. Calls `submitLog()` from F3-S4. Side selector can be a pair of large buttons with `$state` binding.
 
@@ -425,10 +425,10 @@ F3-S1 first (layout). Then F3-S2 and F3-S3 can be parallel (both slot into the l
 
 **Acceptance Criteria:**
 
-- [ ] Reusable feedback component: loading spinner, success state (checkmark + "Logged!"), error state (message + retry)
-- [ ] Success auto-navigates to home after ~1.5 seconds
-- [ ] Error state shows "Try Again" button that re-submits
-- [ ] States are visually distinct (color, icon) and obvious at a glance
+- [x] Reusable feedback component: loading spinner, success state (checkmark + "Logged!"), error state (message + retry)
+- [x] Success auto-navigates to home after ~1.5 seconds
+- [x] Error state shows "Try Again" button that re-submits
+- [x] States are visually distinct (color, icon) and obvious at a glance
 
 **Technical Notes:** Extract from F4-S2's save flow into a shared `SubmitFeedback.svelte` component. Used by all three log screens.
 

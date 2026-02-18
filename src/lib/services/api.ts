@@ -33,7 +33,7 @@ export const submitLog = async (data: LogPayload): Promise<SubmitResult> => {
   try {
     const response = await fetch(appsScriptUrl, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "text/plain" },
       body: JSON.stringify({ ...data, secret }),
       signal: controller.signal,
     });
