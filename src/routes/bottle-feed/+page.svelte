@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { base } from '$app/paths';
-	import Timer from '$lib/components/Timer.svelte';
 	import AmountInput from '$lib/components/AmountInput.svelte';
 	import SubmitFeedback from '$lib/components/SubmitFeedback.svelte';
-	import { userStore } from '$lib/stores/user.svelte';
+	import Timer from '$lib/components/Timer.svelte';
 	import { submitLog } from '$lib/services/api';
+	import { userStore } from '$lib/stores/user.svelte';
 
 	type SubmitState = 'idle' | 'loading' | 'success' | 'error';
 
@@ -47,8 +47,8 @@
 
 <div class="flex flex-1 flex-col gap-6 p-6">
 	<div class="flex items-center gap-3">
-		<a href="{base}/" class="text-sm text-violet-600 hover:underline" aria-label="Back to home">← Back</a>
-		<h2 class="text-2xl font-bold text-sky-700">🍼 Bottle Feed</h2>
+		<a href="{base}/" class="text-sm text-brand hover:underline" aria-label="Back to home">← Back</a>
+		<h2 class="text-2xl font-bold text-ink">🍼 Bottle Feed</h2>
 	</div>
 
 	{#if submitState !== 'idle'}
@@ -74,23 +74,23 @@
 		<!-- Save -->
 		<div class="mt-auto">
 			{#if amountBefore === 0}
-				<p class="mb-3 text-center text-sm text-gray-400">Enter the amount in the bottle to get started.</p>
+				<p class="mb-3 text-center text-sm text-ink-subtle">Enter the amount in the bottle to get started.</p>
 			{:else if timerRunning}
-				<p class="mb-3 text-center text-sm text-gray-400">Stop the timer when the feed is finished.</p>
+				<p class="mb-3 text-center text-sm text-ink-subtle">Stop the timer when the feed is finished.</p>
 			{:else if elapsedSeconds === 0}
-				<p class="mb-3 text-center text-sm text-gray-400">Start the timer when the feed begins.</p>
+				<p class="mb-3 text-center text-sm text-ink-subtle">Start the timer when the feed begins.</p>
 			{/if}
 			<button
 				type="button"
 				onclick={save}
 				disabled={!canSave}
 				class="w-full rounded-2xl py-4 text-xl font-bold shadow-sm transition-colors"
-				class:bg-violet-600={canSave}
+				class:bg-brand={canSave}
 				class:text-white={canSave}
-				class:hover:bg-violet-700={canSave}
-				class:active:bg-violet-800={canSave}
-				class:bg-gray-100={!canSave}
-				class:text-gray-400={!canSave}
+				class:hover:bg-brand-hover={canSave}
+				class:active:bg-brand-active={canSave}
+				class:bg-surface-tint={!canSave}
+				class:text-ink-placeholder={!canSave}
 				class:cursor-not-allowed={!canSave}
 			>
 				Save

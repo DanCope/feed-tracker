@@ -1,1 +1,106 @@
 @import "tailwindcss";
+
+/* ─── Tier 1: Raw palette ─────────────────────────────────────────────────── */
+/* Never reference these directly in components. Use semantic tokens below.    */
+:root {
+  --palette-neutral-50: #faf8f3;
+  --palette-neutral-100: #f3ede4;
+  --palette-neutral-200: #e4d9cc;
+  --palette-neutral-300: #cdbfb0;
+  --palette-neutral-400: #a08070;
+  --palette-neutral-500: #7a6457;
+  --palette-neutral-600: #5c4b40;
+  --palette-neutral-700: #3d3029;
+  --palette-neutral-800: #261d18;
+  --palette-neutral-900: #170d08;
+}
+
+/* ─── Tier 2: Semantic tokens — light mode defaults ──────────────────────── */
+:root {
+  --ds-surface: #faf8f3; /* page background          */
+  --ds-surface-raised: #ffffff; /* card / input background  */
+  --ds-surface-tint: #e4d9cc; /* subtle tint: disabled, unselected chips */
+  --ds-edge: #e4d9cc; /* borders & dividers       */
+  --ds-ink: #170d08; /* primary text             */
+  --ds-ink-subtle: #7a6457; /* secondary / label text   */
+  --ds-ink-placeholder: #a08070; /* input placeholders       */
+  --ds-brand-subtle: #e8f0e9; /* brand tint: selected chip backgrounds */
+  --ds-success-subtle: #edf4ee;
+  --ds-error-subtle: #f9ece9;
+}
+
+/* ─── Tier 2: Semantic tokens — dark mode overrides ─────────────────────── */
+/* Applied when: system prefers dark (and no manual override to light),      */
+/* OR user has explicitly chosen dark via [data-theme="dark"].               */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ds-surface: #170d08;
+    --ds-surface-raised: #261d18;
+    --ds-surface-tint: #3d3029;
+    --ds-edge: #3d3029;
+    --ds-ink: #faf8f3;
+    --ds-ink-subtle: #a08070;
+    --ds-ink-placeholder: #5c4b40;
+    --ds-brand-subtle: #2e4531;
+    --ds-success-subtle: #1a3320;
+    --ds-error-subtle: #3d1a14;
+  }
+}
+
+/* Manual dark override — always dark regardless of system preference. */
+:root[data-theme="dark"] {
+  --ds-surface: #170d08;
+  --ds-surface-raised: #261d18;
+  --ds-surface-tint: #3d3029;
+  --ds-edge: #3d3029;
+  --ds-ink: #faf8f3;
+  --ds-ink-subtle: #a08070;
+  --ds-ink-placeholder: #5c4b40;
+  --ds-brand-subtle: #2e4531;
+  --ds-success-subtle: #1a3320;
+  --ds-error-subtle: #3d1a14;
+}
+
+/* ─── Tier 3: Tailwind @theme — static brand tokens ─────────────────────── */
+/* These are resolved at build time and do NOT change between light/dark.     */
+@theme {
+  /* Brand — Dried Sage */
+  --color-brand: #4d6e52;
+  --color-brand-hover: #3d5a41;
+  --color-brand-active: #2e4531;
+
+  /* Signal — Dried Rose (timer-running state only) */
+  --color-signal: #9b5e6e;
+  --color-signal-hover: #7d4a58;
+
+  /* Status */
+  --color-success: #3d6b45;
+  --color-error: #a0402e;
+
+  /* Neutral static scale (range inputs, illustrative UI, shimmer) */
+  --color-neutral-50: #faf8f3;
+  --color-neutral-100: #f3ede4;
+  --color-neutral-200: #e4d9cc;
+  --color-neutral-300: #cdbfb0;
+  --color-neutral-400: #a08070;
+  --color-neutral-500: #7a6457;
+  --color-neutral-600: #5c4b40;
+  --color-neutral-700: #3d3029;
+  --color-neutral-800: #261d18;
+  --color-neutral-900: #170d08;
+}
+
+/* ─── Tier 3: Tailwind @theme inline — dynamic semantic tokens ───────────── */
+/* These reference CSS variables so they swap automatically in dark mode.     */
+@theme inline {
+  --color-surface: var(--ds-surface);
+  --color-surface-raised: var(--ds-surface-raised);
+  --color-surface-tint: var(--ds-surface-tint);
+  --color-edge: var(--ds-edge);
+  --color-ink: var(--ds-ink);
+  --color-ink-subtle: var(--ds-ink-subtle);
+  --color-ink-placeholder: var(--ds-ink-placeholder);
+  --color-brand-subtle: var(--ds-brand-subtle);
+  --color-success-subtle: var(--ds-success-subtle);
+  --color-error-subtle: var(--ds-error-subtle);
+}

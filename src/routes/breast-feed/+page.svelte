@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { base } from '$app/paths';
-	import Timer from '$lib/components/Timer.svelte';
 	import SubmitFeedback from '$lib/components/SubmitFeedback.svelte';
-	import { userStore } from '$lib/stores/user.svelte';
-	import { submitLog } from '$lib/services/api';
+	import Timer from '$lib/components/Timer.svelte';
 	import type { Side } from '$lib/services/api';
+	import { submitLog } from '$lib/services/api';
+	import { userStore } from '$lib/stores/user.svelte';
 
 	type SubmitState = 'idle' | 'loading' | 'success' | 'error';
 
@@ -45,8 +45,8 @@
 
 <div class="flex flex-1 flex-col gap-6 p-6">
 	<div class="flex items-center gap-3">
-		<a href="{base}/" class="text-sm text-violet-600 hover:underline" aria-label="Back to home">← Back</a>
-		<h2 class="text-2xl font-bold text-rose-700">🤱 Breast Feed</h2>
+		<a href="{base}/" class="text-sm text-brand hover:underline" aria-label="Back to home">← Back</a>
+		<h2 class="text-2xl font-bold text-ink">🤱 Breast Feed</h2>
 	</div>
 
 	{#if submitState !== 'idle'}
@@ -56,7 +56,7 @@
 	{:else}
 		<!-- Side selector -->
 		<section aria-labelledby="side-label">
-			<p id="side-label" class="mb-3 text-sm font-semibold uppercase tracking-wider text-gray-500">
+			<p id="side-label" class="mb-3 text-sm font-semibold uppercase tracking-wider text-ink-subtle">
 				Which side?
 			</p>
 			<div class="flex gap-3" role="group" aria-labelledby="side-label">
@@ -65,12 +65,12 @@
 						type="button"
 						onclick={() => (side = option)}
 						class="flex-1 rounded-2xl py-5 text-xl font-bold shadow-sm transition-colors"
-						class:bg-rose-600={side === option}
+						class:bg-brand={side === option}
 						class:text-white={side === option}
-						class:bg-rose-50={side !== option}
-						class:text-rose-700={side !== option}
+						class:bg-surface-tint={side !== option}
+						class:text-brand={side !== option}
 						class:ring-2={side === option}
-						class:ring-rose-600={side === option}
+						class:ring-brand={side === option}
 						aria-pressed={side === option}
 					>
 						{option}
@@ -87,23 +87,23 @@
 		<!-- Save -->
 		<div class="mt-auto">
 			{#if timerRunning}
-				<p class="mb-3 text-center text-sm text-gray-400">Stop the timer when the feed is finished.</p>
+				<p class="mb-3 text-center text-sm text-ink-subtle">Stop the timer when the feed is finished.</p>
 			{:else if elapsedSeconds === 0 && side !== null}
-				<p class="mb-3 text-center text-sm text-gray-400">Start the timer when the feed begins.</p>
+				<p class="mb-3 text-center text-sm text-ink-subtle">Start the timer when the feed begins.</p>
 			{:else if side === null}
-				<p class="mb-3 text-center text-sm text-gray-400">Select a side to get started.</p>
+				<p class="mb-3 text-center text-sm text-ink-subtle">Select a side to get started.</p>
 			{/if}
 			<button
 				type="button"
 				onclick={save}
 				disabled={!canSave}
 				class="w-full rounded-2xl py-4 text-xl font-bold shadow-sm transition-colors"
-				class:bg-violet-600={canSave}
+				class:bg-brand={canSave}
 				class:text-white={canSave}
-				class:hover:bg-violet-700={canSave}
-				class:active:bg-violet-800={canSave}
-				class:bg-gray-100={!canSave}
-				class:text-gray-400={!canSave}
+				class:hover:bg-brand-hover={canSave}
+				class:active:bg-brand-active={canSave}
+				class:bg-surface-tint={!canSave}
+				class:text-ink-placeholder={!canSave}
 				class:cursor-not-allowed={!canSave}
 			>
 				Save
