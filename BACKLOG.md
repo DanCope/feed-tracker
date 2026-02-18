@@ -459,9 +459,9 @@ F4-S1 (timer) can start as soon as F1-S1 lands — it's a standalone component. 
 
 **Definition of Done:**
 
-- [ ] Can log a bottle feed with before amount, duration, and after amount
-- [ ] Log appears in Google Sheet with correct data
-- [ ] Amounts are in ml
+- [x] Can log a bottle feed with before amount, duration, and after amount
+- [x] Log appears in Google Sheet with correct data
+- [x] Amounts are in ml
 
 ### Stories
 
@@ -475,12 +475,12 @@ F4-S1 (timer) can start as soon as F1-S1 lands — it's a standalone component. 
 
 **Acceptance Criteria:**
 
-- [ ] Numeric input component with large touch target
-- [ ] Displays value in ml with unit label
-- [ ] Increment/decrement buttons (±10ml) for quick adjustment
-- [ ] Can also type directly for exact values
-- [ ] Minimum 0, reasonable maximum (e.g., 500ml)
-- [ ] Component exposes value as a bindable number
+- [x] Numeric input component with large touch target
+- [x] Displays value in ml with unit label
+- [x] Increment/decrement buttons (±10ml) for quick adjustment
+- [x] Can also type directly for exact values
+- [x] Minimum 0, reasonable maximum (e.g., 500ml)
+- [x] Component exposes value as a bindable number
 
 **Technical Notes:** A `<input type="number">` with large step buttons on either side. Mobile keyboards show numeric pad with `inputmode="numeric"`. Step buttons are faster than typing for common amounts.
 
@@ -500,12 +500,12 @@ F4-S1 (timer) can start as soon as F1-S1 lands — it's a standalone component. 
 
 **Acceptance Criteria:**
 
-- [ ] Screen shows: Amount Before input → Timer → Amount After input → Save
-- [ ] Flow guides the user: before amount first, then start timer, then after amount when done
-- [ ] "Save" submits: user, type ("bottle"), duration, amount_before, amount_after
-- [ ] Save button disabled until before amount > 0 and timer has run
-- [ ] Uses shared SubmitFeedback component for loading/success/error
-- [ ] After amount defaults to 0 (can be left at 0 if bottle emptied)
+- [x] Screen shows: Amount Before input → Timer → Amount After input → Save
+- [x] Flow guides the user: before amount first, then start timer, then after amount when done
+- [x] "Save" submits: user, type ("bottle"), duration, amount_before, amount_after
+- [x] Save button disabled until before amount > 0 and timer has run
+- [x] Uses shared SubmitFeedback component for loading/success/error
+- [x] After amount defaults to 0 (can be left at 0 if bottle emptied)
 
 **Technical Notes:** Route: `src/routes/bottle-feed/+page.svelte`. Reuses Timer (F4-S1), AmountInput (F5-S1), SubmitFeedback (F4-S3).
 
