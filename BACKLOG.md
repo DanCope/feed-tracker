@@ -612,8 +612,8 @@ F6-S1 can start in parallel with F4 and F5 (independent component). F6-S2 needs 
 
 - [ ] App is installable on Android and iOS
 - [ ] Launches in standalone mode (no browser bar)
-- [ ] Has a proper icon on the home screen
-- [ ] Correct app name and theme color
+- [x] Has a proper icon on the home screen
+- [x] Correct app name and theme color
 
 ### Stories
 
@@ -627,10 +627,10 @@ F6-S1 can start in parallel with F4 and F5 (independent component). F6-S2 needs 
 
 **Acceptance Criteria:**
 
-- [ ] App icon generated in required sizes: 192×192, 512×512
-- [ ] Maskable variant included for Android adaptive icons
-- [ ] Icon is simple and recognizable (e.g., baby bottle emoji/illustration)
-- [ ] Icons placed in `static/` directory
+- [x] App icon generated in required sizes: 192×192, 512×512
+- [x] Maskable variant included for Android adaptive icons
+- [x] Icon is simple and recognizable (e.g., baby bottle emoji/illustration)
+- [x] Icons placed in `static/` directory
 
 **Technical Notes:** Use a PWA icon generator (e.g., realfavicongenerator.net or pwa-asset-generator). Keep it simple — a single emoji-style image works fine. Maskable icon needs safe zone padding.
 
@@ -650,10 +650,10 @@ F6-S1 can start in parallel with F4 and F5 (independent component). F6-S2 needs 
 
 **Acceptance Criteria:**
 
-- [ ] Manifest includes: name ("Feed Tracker"), short_name ("FeedTrack"), icons, display ("standalone"), theme_color, background_color, start_url (with base path)
-- [ ] Service worker precaches the app shell for fast loading
-- [ ] `vite-plugin-pwa` configured with `registerType: 'autoUpdate'`
-- [ ] Manifest `start_url` accounts for GitHub Pages base path
+- [x] Manifest includes: name ("Feed Tracker"), short_name ("FeedTrack"), icons, display ("standalone"), theme_color, background_color, start_url (with base path)
+- [x] Service worker precaches the app shell for fast loading
+- [x] `vite-plugin-pwa` configured with `registerType: 'autoUpdate'`
+- [x] Manifest `start_url` accounts for GitHub Pages base path
 
 **Technical Notes:** Configure in `vite.config.ts` under the PWA plugin options. Theme color should match the header. Use `scope` and `start_url` carefully with the base path.
 
