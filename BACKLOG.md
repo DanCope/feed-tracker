@@ -5,7 +5,7 @@
 
 ## Summary
 
-8 features. MVP (F1–F7) is complete. Phase 2 is F8–F9: F8 extends the existing Google Apps Script with a read endpoint so both parents can see a live "recent activity" summary on the home screen (last breast side used, last bottle amount, last nappy); F9 covers remaining polish (haptic feedback, timestamp override, PWA shortcuts).
+8 features. MVP (F1–F7) is complete. Phase 2 is F8–F9: F8 extends the existing Google Apps Script with a read endpoint so both parents can see a live "recent activity" summary on the home screen (last breast side used, last bottle amount, last nappy); F9 covers remaining polish (haptic feedback, timestamp override, PWA shortcuts, expandable notes field).
 
 ## Feature Index
 
@@ -19,7 +19,7 @@
 | F6  | Nappy Change Logging                      | MVP     | 2       | 1 (parallel with F4, F5) |
 | F7  | PWA Install Experience                    | MVP     | 3       | 1 (parallel with F4–F6)  |
 | F8  | GAS Read Endpoint & Recent Activity       | Phase 2 | 3       | 1                        |
-| F9  | Polish & Quality of Life                  | Phase 2 | 3       | 2                        |
+| F9  | Polish & Quality of Life                  | Phase 2 | 6       | 2                        |
 
 ---
 
@@ -814,7 +814,7 @@ Linear within F8: S1 (Apps Script update + publish new version) → S2 (client s
 
 ## F9 — Polish & Quality of Life (Phase 2)
 
-**Description:** Small improvements that make the app more pleasant to use — haptic feedback, timestamp override for retroactive logging, recent log summary, and PWA app shortcuts.
+**Description:** Small improvements that make the app more pleasant to use — haptic feedback, timestamp override for retroactive logging, PWA app shortcuts, an optional notes field, contextual “last feed” hints on each log screen, and a polished back button.
 
 **Source:** Product Brief — Phase 2: Polish
 
@@ -895,9 +895,83 @@ Linear within F8: S1 (Apps Script update + publish new version) → S2 (client s
 
 ---
 
+#### F9-S4 — Expandable notes field on all log screens
+
+**Size:** S
+**Dependencies:** F4-S2, F5-S2, F6-S2 (all log screens exist)
+**Blocks:** None
+
+**User Story:** As a parent, I want to optionally add a short note to any log entry so that I can capture context that doesn't fit the standard fields (e.g. "fussy during feed", "tried new formula").
+
+**Acceptance Criteria:**
+
+- [ ] All three log screens (breast feed, bottle feed, nappy change) have an optional "Add a note" toggle below the main form controls
+- [ ] Tapping "Add a note" expands a `<textarea>` inline — collapsed and hidden by default
+- [ ] When collapsed with text already entered, a summary (e.g. "Note: fussy during feed") is shown so the note isn't silently lost
+- [ ] Note value is included in the `submitLog` payload as `notes` (field already exists in the API and sheet schema)
+- [ ] Textarea is cleared and collapsed after a successful save
+- [ ] No note = empty string sent — sheet cell left blank (existing `doPost` behaviour unchanged)
+
+**Technical Notes:** Use a `$state` boolean `showNotes` per screen toggled by the button. The `notes` field in `LogPayload` is already defined in `api.ts` and `doPost` already handles it — no backend changes needed. Keep the textarea `rows=3`, `maxlength=500`. Use `text-ink`, `bg-surface-raised`, `border-edge` tokens per the design system.
+
+**Files Likely Affected:** `src/routes/breast-feed/+page.svelte`, `src/routes/bottle-feed/+page.svelte`, `src/routes/nappy-change/+page.svelte`
+
+**Out of Scope:** Notes on the home screen recent-activity summary, editing notes after save, character count display.
+
+---
+
+#### F9-S5 — Contextual last-log hints on each log screen
+
+**Size:** S
+**Dependencies:** F8-S2 (`latestStore` with per-type derived values), F4-S2, F5-S2, F6-S2
+**Blocks:** None
+
+**User Story:** As a parent, I want to see relevant context from the last log of the same type so that I can make a more informed choice (e.g. which breast to use, how much to put in the bottle).
+
+**Acceptance Criteria:**
+
+- [ ] **Breast feed screen:** A "Last" badge appears on the Left or Right button that was most recently used, with a time and user hint below the selector (e.g. “Last: Right · 2h ago · Mum”). No side is pre-selected — the badge informs, the parent still taps deliberately.
+- [ ] **Bottle feed screen:** A reference line above the Amount Before input shows the last bottle's consumption (`amount_before − amount_after`), the full before/after breakdown, and relative time (e.g. “Last bottle: 90 ml consumed (120 → 30 ml) · 3h ago · Dad”). No value is pre-filled.
+- [ ] **Nappy change screen:** A single summary line at the top of the form shows the last nappy entry (e.g. “Last nappy: Medium poop · Small pee · 4h ago · Mum”). Poop and pee selectors remain at their default “None” state.
+- [ ] Hints are hidden (not rendered) when no relevant log exists yet in the store
+- [ ] Hints use `text-ink-subtle` and `text-sm` — clearly secondary to the interactive controls
+- [ ] Relative times use the same bands as F8-S3 (“just now” / “Xm ago” / “Xh ago” / “yesterday”)
+
+**Technical Notes:** All data comes from `lastBreastFeed`, `lastBottleFeed`, `lastNappyChange` derived values already computed by `latestStore` in F8-S2. Trigger `latestStore.refresh()` in a `$effect` on the log screen (same pattern as the home screen). No additional fetch — the store cache means data is available instantly if the home screen was visited first. Bottle consumption is a client-side calculation: `entry.amountBefore - entry.amountAfter`.
+
+**Files Likely Affected:** `src/routes/breast-feed/+page.svelte`, `src/routes/bottle-feed/+page.svelte`, `src/routes/nappy-change/+page.svelte`
+
+**Out of Scope:** Pre-filling inputs based on last values, per-user filtering of hints, hints on the pump screen.
+
+---
+
+#### F9-S6 — Restyle back button on log and settings screens
+
+**Size:** XS
+**Dependencies:** F4-S2, F5-S2, F6-S2 (log screens exist)
+**Blocks:** None
+
+**User Story:** As a parent, I want the back button to look like a button so that it’s obviously tappable, while keeping it small and out of the way so I don’t hit it by accident.
+
+**Acceptance Criteria:**
+
+- [ ] Back button on all three log screens and the settings screen is styled as a small ghost/secondary button: `bg-surface-raised border border-edge text-ink hover:bg-surface-tint rounded-xl`
+- [ ] Size kept deliberately small (`text-sm`, `px-3 py-2`) — not a full-width or primary-CTA style
+- [ ] Arrow and label unchanged: `← Back` on log screens, `← Back to home` on settings
+- [ ] Position unchanged (top-left of the screen header area, before the page title)
+- [ ] Focus ring uses `focus:ring-2 focus:ring-brand/25 focus:border-brand` per design system
+
+**Technical Notes:** Replace the current `class="text-sm text-brand hover:underline"` with the ghost button classes. `<a>` element stays — no change to routing or `href`. Apply consistently across all four screens.
+
+**Files Likely Affected:** `src/routes/breast-feed/+page.svelte`, `src/routes/bottle-feed/+page.svelte`, `src/routes/nappy-change/+page.svelte`, `src/routes/settings/+page.svelte`
+
+**Out of Scope:** Swipe-back gesture, custom back icon, animated transitions.
+
+---
+
 ### Sequencing
 
-All three stories are independent — can be worked in any order or in parallel. F9-S1 is trivial and can be done first as a quick win. F9-S2 is the meatiest.
+All six stories are independent — can be worked in any order or in parallel. F9-S1, F9-S4, F9-S5, and F9-S6 are all small-to-trivial and make ideal quick wins. F9-S2 is the meatiest.
 
 ### Risks
 
@@ -924,12 +998,13 @@ All three stories are independent — can be worked in any order or in parallel.
 | F8-S2 requires F8-S1            | Service function needs a working `doGet` endpoint            |
 | F8-S3 requires F8-S2, F3-S3     | Home screen UI needs the store and existing home page        |
 | F9-S2 requires F2-S2, F8-S1     | Timestamp override needs an Apps Script update (new version) |
+| F9-S5 requires F8-S2            | Per-screen hints consume the `latestStore` derived values    |
 
 ## Parallel Work Summary
 
 **MVP is complete (F1–F7).** Phase 2 work:
 
 1. **F8 first:** S1 (update Apps Script, publish new version) is a quick manual step. Unblock it early so the 1–3s GAS cold-start risk can be validated before building the UI. S2 and S3 can be developed in parallel against a mocked response.
-2. **F9 in parallel with F8-S3:** F9-S1 (haptic) and F9-S3 (PWA shortcuts) are trivial and independent. F9-S2 (timestamp override) also requires an Apps Script update — batch that change with F8-S1 to avoid publishing twice.
+2. **F9 in parallel with F8-S3:** F9-S1 (haptic), F9-S3 (PWA shortcuts), F9-S4 (notes field), F9-S5 (per-screen hints), and F9-S6 (back button) are all small and independent. F9-S5 depends on F8-S2 (latestStore) so start it once F8-S2 is done. F9-S2 (timestamp override) also requires an Apps Script update — batch that change with F8-S1 to avoid publishing twice.
 
 **Shared components** (Timer, AmountInput, ScaleSelector, SubmitFeedback, and the new LastActivity) continue to be the force multipliers.
