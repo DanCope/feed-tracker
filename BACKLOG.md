@@ -1,11 +1,11 @@
 # Backlog: Feed Tracker
 
 > Derived from: [PROJECT.md](PROJECT.md)
-> Generated: 2026-02-17
+> Generated: 2026-02-17 · Revised: 2026-02-21
 
 ## Summary
 
-9 features, 26 stories. MVP is Features F1–F7 (20 stories), Phase 2 is F8–F9 (6 stories). The critical path runs through project scaffolding (F1) → app shell (F3) → breast feed logging (F4). Google Sheet setup (F2) runs in parallel with F1. Once the shell and first log screen land, bottle feed (F5), nappy change (F6), and PWA polish (F7) can all be worked in parallel. A solo developer can ship MVP in roughly 2–3 focused weekends.
+8 features. MVP (F1–F7) is complete. Phase 2 is F8–F9: F8 extends the existing Google Apps Script with a read endpoint so both parents can see a live "recent activity" summary on the home screen (last breast side used, last bottle amount, last nappy); F9 covers remaining polish (haptic feedback, timestamp override, PWA shortcuts).
 
 ## Feature Index
 
@@ -18,8 +18,8 @@
 | F5  | Bottle Feed Logging                       | MVP     | 2       | 1 (parallel with F6)     |
 | F6  | Nappy Change Logging                      | MVP     | 2       | 1 (parallel with F4, F5) |
 | F7  | PWA Install Experience                    | MVP     | 3       | 1 (parallel with F4–F6)  |
-| F8  | Breast Pump Logging                       | Phase 2 | 2       | 1                        |
-| F9  | Polish & Quality of Life                  | Phase 2 | 4       | 2                        |
+| F8  | GAS Read Endpoint & Recent Activity       | Phase 2 | 3       | 1                        |
+| F9  | Polish & Quality of Life                  | Phase 2 | 3       | 2                        |
 
 ---
 
@@ -701,76 +701,114 @@ F7-S1 (icons) can start anytime after F1-S1. F7-S2 needs the icons. F7-S3 needs 
 
 ---
 
-## F8 — Breast Pump Logging (Phase 2)
+## F8 — GAS Read Endpoint & Recent Activity
 
-**Description:** Add a breast pump log screen — which breast (or both), a timer for pump duration, and the amount pumped. Same patterns as breast feed and bottle feed combined.
+**Description:** Add a `doGet` handler to the existing Google Apps Script so the app can read recent log entries from the shared sheet. Wire this into a home screen "Recent activity" summary showing the last breast feed side used, last bottle feed, and last nappy change — a live view shared across both parents' devices so either parent can see what happened most recently without checking the sheet.
 
-**Source:** Product Brief — Phase 2: Pump Tracking
+**Source:** Conversation 2026-02-19 — "which breast she last fed off, or when was the last bottle feed"
 
 **Definition of Done:**
 
-- [ ] Can log a pump session with side, duration, and amount
-- [ ] Log appears in Google Sheet as type "pump"
-- [ ] Home screen updated with fourth button
+- [ ] Apps Script handles `doGet` requests and returns recent rows as JSON
+- [ ] Client can fetch and display the last event per log type
+- [ ] Home screen shows last breast feed (side), last bottle feed (amount consumed), and last nappy change with relative time and which parent logged it
+- [ ] Data is shared across both parents' devices (reads from the sheet, not device-local cache)
 
 ### Stories
 
-#### F8-S1 — Pump screen
+#### F8-S1 — Add doGet handler to Apps Script
 
-**Size:** M
-**Dependencies:** F4-S1 (timer), F5-S1 (amount input), F3-S4 (API service)
+**Size:** S
+**Dependencies:** F2-S2 (existing doPost script), F2-S3 (deployed web app)
 **Blocks:** F8-S2
 
-**User Story:** As a parent, I want to log a breast pump session so that I can track how much milk I'm expressing and from which side.
+**User Story:** As a developer, I want the Apps Script to return recent log rows via GET so that the client can read shared data from the sheet.
 
 **Acceptance Criteria:**
 
-- [ ] Screen shows: Side selector (Left / Right / Both) → Timer → Amount pumped (ml) → Save
-- [ ] "Both" option available (unlike breast feed which is L/R only)
-- [ ] "Save" submits: user, type ("pump"), side, duration, amount_before (amount pumped), amount_after (blank)
-- [ ] Uses shared Timer, AmountInput, and SubmitFeedback components
-- [ ] Save button disabled until side selected and timer has run
+- [ ] `doGet(e)` validates the shared secret from `e.parameter.secret`
+- [ ] Reads the last N rows from the sheet (default 20, max 100, configurable via `e.parameter.limit`)
+- [ ] Returns JSON: `{ "status": "ok", "data": [{ timestamp, user, type, side, duration, amountBefore, amountAfter, poop, pee, notes }, ...] }` ordered newest-first
+- [ ] Returns `{ "status": "error", "message": "Unauthorized" }` on invalid secret
+- [ ] Derives column order from the header row (row 1) rather than hardcoded indices for resilience
+- [ ] Same deployment ID and URL — only a new deployment _version_ needs to be published (Manage deployments → edit → New version)
 
-**Technical Notes:** Route: `src/routes/pump/+page.svelte`. Reuses all existing components. The "amount pumped" maps to `amount_before` in the sheet schema — no schema change needed.
+**Technical Notes:** `ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON)`. GAS handles CORS automatically. GET requests from `fetch()` follow the 302 redirect GAS issues — the default `redirect: "follow"` handles this. Publishing a new version under the same deployment keeps the existing client config unchanged.
 
-**Files Likely Affected:** `src/routes/pump/+page.svelte`
+**Files Likely Affected:** Google Apps Script (Code.gs)
 
-**Out of Scope:** Tracking which pump device, pump settings.
+**Out of Scope:** Filtering by user or date range, pagination beyond the `limit` param.
 
 ---
 
-#### F8-S2 — Add Pump to home screen navigation
+#### F8-S2 — fetchLatestLogs() service function and reactive store
 
-**Size:** S
+**Size:** M
 **Dependencies:** F8-S1
-**Blocks:** None
+**Blocks:** F8-S3
 
-**User Story:** As a parent, I want a Pump button on the home screen so that I can access it as easily as the other log types.
+**User Story:** As a developer, I want a typed client service and reactive store for recent logs so that components can easily display up-to-date shared data.
 
 **Acceptance Criteria:**
 
-- [ ] Fourth button "Pump" (🤱 or similar icon) on home screen
-- [ ] Button navigates to pump screen
-- [ ] Button style consistent with existing three buttons
-- [ ] Layout still works with 4 buttons on mobile (2×2 grid or stacked)
+- [ ] `fetchLatestLogs(limit?: number): Promise<FetchLogsResult>` added to `src/lib/services/api.ts`
+  - GETs the Apps Script URL with `?secret=xxx&limit=N` query params
+  - Returns `{ success: true; data: LogEntry[] }` or `{ success: false; message: string }`
+  - Same 15s timeout and error-handling pattern as `submitLog`
+- [ ] `LogEntry` interface exported from `api.ts` matching the sheet columns
+- [ ] `latestStore` created in `src/lib/stores/latest.svelte.ts` using `$state`/`$derived` runes
+  - `$derived` helpers: `lastBreastFeed`, `lastBottleFeed`, `lastNappyChange` (most recent entry per type)
+  - `refresh()` method with 30-second TTL — skips fetch if data was loaded recently
+  - `init()` restores the last response from `localStorage` for instant paint on next visit; `refresh()` then updates in background
+  - `isLoading` state exposed for spinner
+- [ ] All fetch calls inside `$effect()` or explicit `refresh()` — never at module level (prerender safety)
 
-**Technical Notes:** Update `src/routes/+page.svelte`. May need to adjust grid layout from 3 to 4 buttons.
+**Technical Notes:** Secret appears in the GET query string — the same exposure level as `localStorage`. Acceptable for this threat model. The store should not call `fetch` at module scope; only trigger inside `$effect()` in the consuming component.
 
-**Files Likely Affected:** `src/routes/+page.svelte`
+**Files Likely Affected:** `src/lib/services/api.ts`, `src/lib/stores/latest.svelte.ts`
 
-**Out of Scope:** Reordering buttons, customizing which buttons show.
+**Out of Scope:** Real-time polling, push updates, write-side caching.
+
+---
+
+#### F8-S3 — Recent activity section on home screen
+
+**Size:** M
+**Dependencies:** F8-S2, F3-S3 (home screen)
+**Blocks:** None
+
+**User Story:** As a parent, I want to see at a glance when the last feed was and which breast was used so that I don't have to ask my partner or open the sheet.
+
+**Acceptance Criteria:**
+
+- [ ] Home screen displays a "Recent" section below the navigation buttons
+- [ ] Shows one summary row per log type (breast, bottle, nappy) — each row shows type emoji, key detail (side / amount consumed / poop+pee scale), relative time (e.g., "2h ago"), and which parent logged it
+- [ ] Relative time recalculates client-side without re-fetching
+- [ ] Uses `localStorage`-cached data for instant display on load; fetches updated data from the sheet in background
+- [ ] Shows a "No logs yet" placeholder when cache is empty and no fetch has completed
+- [ ] Shows a subtle loading indicator while the initial fetch is in flight
+- [ ] Data is shared across both parents' devices (sourced from the sheet, not per-device cache)
+
+**Technical Notes:** Trigger `latestStore.refresh()` in a `$effect` in `+page.svelte`. Extract a `LastActivity.svelte` component — props: `emoji`, `label`, `detail`, `time`, `user`. Use semantic design tokens (`text-ink-subtle`, `bg-surface-raised`, `border-edge`) per the visual design system. Relative time bands: `"just now"` (<1 min), `"Xm ago"` (<1h), `"Xh ago"` (<24h), `"yesterday"`.
+
+**Files Likely Affected:** `src/routes/+page.svelte`, `src/lib/components/LastActivity.svelte`
+
+**Out of Scope:** Full log history view, filtering, sorting, tapping entries.
 
 ---
 
 ### Sequencing
 
-Linear: S1 → S2. Can start as soon as MVP is stable. Very quick feature — all components already exist.
+Linear within F8: S1 (Apps Script update + publish new version) → S2 (client service + store) → S3 (home screen UI). S1 is a manual step in the Apps Script editor. S2 and the start of S3 can be developed against a mocked API response before S1 is deployed.
 
 ### Risks
 
-| Risk | Impact | Mitigation                                                 |
-| ---- | ------ | ---------------------------------------------------------- |
-| None | —      | All components are reused; this is the lowest-risk feature |
+| Risk                                   | Impact                                         | Mitigation                                                                                |
+| -------------------------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------- |
+| GAS cold-start latency on doGet (1–3s) | Home screen feels slow on first visit          | Show `localStorage` cache immediately; fetch runs in background                           |
+| Secret visible in GET query string     | Slightly less hidden than POST body            | Acceptable — same threat model as existing setup; secret already stored in `localStorage` |
+| New deployment version required        | `doGet` not live until version is published    | Document step clearly; same deployment ID, just a new version                             |
+| GAS 302 redirect on GET                | fetch may fail with non-default redirect modes | Default `redirect: "follow"` handles this correctly                                       |
 
 ---
 
@@ -834,31 +872,7 @@ Linear: S1 → S2. Can start as soon as MVP is stable. Very quick feature — al
 
 ---
 
-#### F9-S3 — Recent logs on home screen
-
-**Size:** M
-**Dependencies:** F3-S3 (home screen), F3-S4 (API service)
-**Blocks:** None
-
-**User Story:** As a parent, I want to see the last few logs on the home screen so that I can quickly check when the last feed was.
-
-**Acceptance Criteria:**
-
-- [ ] Home screen shows the last 5 log entries below the navigation buttons
-- [ ] Each entry shows: time (relative, e.g., "2h ago"), type, key detail (side, amount, scale)
-- [ ] Data sourced from `localStorage` cache (written on each successful save)
-- [ ] Cache is per-device (not synced) — good enough to see your own recent logs
-- [ ] Gracefully shows "No logs yet" when cache is empty
-
-**Technical Notes:** On each successful save, push the log data into a `localStorage` array (keep last 20, display last 5). This avoids reading from the sheet (slow, requires a `doGet` endpoint). Entries are display-only — no interaction.
-
-**Files Likely Affected:** `src/routes/+page.svelte`, `src/lib/stores/recentLogs.ts`, `src/lib/services/api.ts`
-
-**Out of Scope:** Full history view, syncing between devices, pull-to-refresh from sheet.
-
----
-
-#### F9-S4 — PWA app shortcuts
+#### F9-S3 — PWA app shortcuts
 
 **Size:** S
 **Dependencies:** F7-S2 (manifest config)
@@ -883,42 +897,39 @@ Linear: S1 → S2. Can start as soon as MVP is stable. Very quick feature — al
 
 ### Sequencing
 
-All four stories are independent — can be worked in any order or in parallel. F9-S1 is trivial and can be done first as a quick win. F9-S2 and F9-S3 are the meatiest.
+All three stories are independent — can be worked in any order or in parallel. F9-S1 is trivial and can be done first as a quick win. F9-S2 is the meatiest.
 
 ### Risks
 
-| Risk                                             | Impact                     | Mitigation                                                     |
-| ------------------------------------------------ | -------------------------- | -------------------------------------------------------------- |
-| Datetime picker UX varies across mobile browsers | Hard to use at 3am         | Test on target devices; keep it optional and hidden by default |
-| localStorage cache diverges from sheet           | Confusing "recent" display | Clearly label as "your recent logs" — not a shared view        |
+| Risk                                             | Impact             | Mitigation                                                     |
+| ------------------------------------------------ | ------------------ | -------------------------------------------------------------- |
+| Datetime picker UX varies across mobile browsers | Hard to use at 3am | Test on target devices; keep it optional and hidden by default |
 
 ---
 
 ## Cross-Feature Dependencies
 
-| Dependency                      | Reason                                         |
-| ------------------------------- | ---------------------------------------------- |
-| F3-S4 requires F2-S3            | API service needs the Apps Script web app URL  |
-| F4-S2 requires F3 (all stories) | Breast feed screen lives inside the app shell  |
-| F4-S2 requires F4-S1            | Screen uses the timer component                |
-| F5-S2 requires F4-S1            | Bottle feed reuses the timer component         |
-| F5-S2 requires F4-S3            | Bottle feed reuses the feedback component      |
-| F5-S2 requires F5-S1            | Bottle feed uses the amount input component    |
-| F6-S2 requires F4-S3            | Nappy change reuses the feedback component     |
-| F6-S2 requires F6-S1            | Nappy change uses the scale selector component |
-| F7-S3 requires F1-S3            | PWA install test needs a live deploy           |
-| F8-S1 requires F4-S1, F5-S1     | Pump reuses timer and amount components        |
-| F9-S2 requires F2-S2            | Timestamp override needs Apps Script update    |
+| Dependency                      | Reason                                                       |
+| ------------------------------- | ------------------------------------------------------------ |
+| F3-S4 requires F2-S3            | API service needs the Apps Script web app URL                |
+| F4-S2 requires F3 (all stories) | Breast feed screen lives inside the app shell                |
+| F4-S2 requires F4-S1            | Screen uses the timer component                              |
+| F5-S2 requires F4-S1            | Bottle feed reuses the timer component                       |
+| F5-S2 requires F4-S3            | Bottle feed reuses the feedback component                    |
+| F5-S2 requires F5-S1            | Bottle feed uses the amount input component                  |
+| F6-S2 requires F4-S3            | Nappy change reuses the feedback component                   |
+| F6-S2 requires F6-S1            | Nappy change uses the scale selector component               |
+| F7-S3 requires F1-S3            | PWA install test needs a live deploy                         |
+| F8-S1 requires F2-S2, F2-S3     | `doGet` built on the same Apps Script as `doPost`            |
+| F8-S2 requires F8-S1            | Service function needs a working `doGet` endpoint            |
+| F8-S3 requires F8-S2, F3-S3     | Home screen UI needs the store and existing home page        |
+| F9-S2 requires F2-S2, F8-S1     | Timestamp override needs an Apps Script update (new version) |
 
 ## Parallel Work Summary
 
-**For a solo developer,** the optimal order is:
+**MVP is complete (F1–F7).** Phase 2 work:
 
-1. **Weekend 1:** F1 (scaffold) + F2 (sheet & Apps Script) in parallel → F3 (app shell + API wiring)
-2. **Weekend 2:** F4 (breast feed — establishes all patterns) → F5 + F6 in parallel (fast, reuse components)
-3. **Weekend 3:** F7 (PWA polish + install testing) → manual testing on both phones → ship MVP
-4. **Later:** F8 (pump) and F9 (polish) at leisure
+1. **F8 first:** S1 (update Apps Script, publish new version) is a quick manual step. Unblock it early so the 1–3s GAS cold-start risk can be validated before building the UI. S2 and S3 can be developed in parallel against a mocked response.
+2. **F9 in parallel with F8-S3:** F9-S1 (haptic) and F9-S3 (PWA shortcuts) are trivial and independent. F9-S2 (timestamp override) also requires an Apps Script update — batch that change with F8-S1 to avoid publishing twice.
 
-**For two developers,** split infrastructure (F1+F2) from UI (F3→F4), then parallelize F5/F6/F7 across both people.
-
-**Shared components** (Timer, AmountInput, ScaleSelector, SubmitFeedback) are the force multipliers — build them well in F4 and everything after is fast assembly.
+**Shared components** (Timer, AmountInput, ScaleSelector, SubmitFeedback, and the new LastActivity) continue to be the force multipliers.
