@@ -14,7 +14,7 @@ function doPost(e) {
     // var sheet = SpreadsheetApp.openById('YOUR_SPREADSHEET_ID').getSheetByName('Logs');
 
     sheet.appendRow([
-      new Date(), // Timestamp (server-side)
+      payload.timestamp ? new Date(payload.timestamp) : new Date(), // Timestamp (server-side, or client override)
       payload.user || "", // User
       payload.type || "", // Type (breast / bottle / nappy)
       payload.side || "", // Side (left / right / both)

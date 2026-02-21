@@ -49,6 +49,26 @@ export default defineConfig({
             purpose: "maskable",
           },
         ],
+        shortcuts: [
+          {
+            name: "Breast Feed",
+            short_name: "Breast",
+            url: `${base}/breast-feed`,
+            icons: [{ src: "manifest-icon-192.maskable.png", sizes: "192x192", type: "image/png" }],
+          },
+          {
+            name: "Bottle Feed",
+            short_name: "Bottle",
+            url: `${base}/bottle-feed`,
+            icons: [{ src: "manifest-icon-192.maskable.png", sizes: "192x192", type: "image/png" }],
+          },
+          {
+            name: "Nappy Change",
+            short_name: "Nappy",
+            url: `${base}/nappy-change`,
+            icons: [{ src: "manifest-icon-192.maskable.png", sizes: "192x192", type: "image/png" }],
+          },
+        ],
       },
     }),
   ],

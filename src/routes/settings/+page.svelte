@@ -105,5 +105,7 @@
 		</button>
 	</form>
 
-	<a href="{base}/" class="text-center text-sm text-brand underline">← Back to home</a>
+	<div class="flex justify-center">
+		<a href="{base}/" class="rounded-xl border border-edge bg-surface-raised px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-surface-tint focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/25">← Back to home</a>
+	</div>
 </div>
