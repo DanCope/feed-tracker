@@ -709,10 +709,10 @@ F7-S1 (icons) can start anytime after F1-S1. F7-S2 needs the icons. F7-S3 needs 
 
 **Definition of Done:**
 
-- [ ] Apps Script handles `doGet` requests and returns recent rows as JSON
-- [ ] Client can fetch and display the last event per log type
-- [ ] Home screen shows last breast feed (side), last bottle feed (amount consumed), and last nappy change with relative time and which parent logged it
-- [ ] Data is shared across both parents' devices (reads from the sheet, not device-local cache)
+- [x] Apps Script handles `doGet` requests and returns recent rows as JSON
+- [x] Client can fetch and display the last event per log type
+- [x] Home screen shows last breast feed (side), last bottle feed (amount consumed), and last nappy change with relative time and which parent logged it
+- [x] Data is shared across both parents' devices (reads from the sheet, not device-local cache)
 
 ### Stories
 
@@ -726,12 +726,12 @@ F7-S1 (icons) can start anytime after F1-S1. F7-S2 needs the icons. F7-S3 needs 
 
 **Acceptance Criteria:**
 
-- [ ] `doGet(e)` validates the shared secret from `e.parameter.secret`
-- [ ] Reads the last N rows from the sheet (default 20, max 100, configurable via `e.parameter.limit`)
-- [ ] Returns JSON: `{ "status": "ok", "data": [{ timestamp, user, type, side, duration, amountBefore, amountAfter, poop, pee, notes }, ...] }` ordered newest-first
-- [ ] Returns `{ "status": "error", "message": "Unauthorized" }` on invalid secret
-- [ ] Derives column order from the header row (row 1) rather than hardcoded indices for resilience
-- [ ] Same deployment ID and URL — only a new deployment _version_ needs to be published (Manage deployments → edit → New version)
+- [x] `doGet(e)` validates the shared secret from `e.parameter.secret`
+- [x] Reads the last N rows from the sheet (default 20, max 100, configurable via `e.parameter.limit`)
+- [x] Returns JSON: `{ "status": "ok", "data": [{ timestamp, user, type, side, duration, amountBefore, amountAfter, poop, pee, notes }, ...] }` ordered newest-first
+- [x] Returns `{ "status": "error", "message": "Unauthorized" }` on invalid secret
+- [x] Derives column order from the header row (row 1) rather than hardcoded indices for resilience
+- [x] Same deployment ID and URL — only a new deployment _version_ needs to be published (Manage deployments → edit → New version)
 
 **Technical Notes:** `ContentService.createTextOutput(JSON.stringify(data)).setMimeType(ContentService.MimeType.JSON)`. GAS handles CORS automatically. GET requests from `fetch()` follow the 302 redirect GAS issues — the default `redirect: "follow"` handles this. Publishing a new version under the same deployment keeps the existing client config unchanged.
 
@@ -751,17 +751,17 @@ F7-S1 (icons) can start anytime after F1-S1. F7-S2 needs the icons. F7-S3 needs 
 
 **Acceptance Criteria:**
 
-- [ ] `fetchLatestLogs(limit?: number): Promise<FetchLogsResult>` added to `src/lib/services/api.ts`
+- [x] `fetchLatestLogs(limit?: number): Promise<FetchLogsResult>` added to `src/lib/services/api.ts`
   - GETs the Apps Script URL with `?secret=xxx&limit=N` query params
   - Returns `{ success: true; data: LogEntry[] }` or `{ success: false; message: string }`
   - Same 15s timeout and error-handling pattern as `submitLog`
-- [ ] `LogEntry` interface exported from `api.ts` matching the sheet columns
-- [ ] `latestStore` created in `src/lib/stores/latest.svelte.ts` using `$state`/`$derived` runes
+- [x] `LogEntry` interface exported from `api.ts` matching the sheet columns
+- [x] `latestStore` created in `src/lib/stores/latest.svelte.ts` using `$state`/`$derived` runes
   - `$derived` helpers: `lastBreastFeed`, `lastBottleFeed`, `lastNappyChange` (most recent entry per type)
   - `refresh()` method with 30-second TTL — skips fetch if data was loaded recently
   - `init()` restores the last response from `localStorage` for instant paint on next visit; `refresh()` then updates in background
   - `isLoading` state exposed for spinner
-- [ ] All fetch calls inside `$effect()` or explicit `refresh()` — never at module level (prerender safety)
+- [x] All fetch calls inside `$effect()` or explicit `refresh()` — never at module level (prerender safety)
 
 **Technical Notes:** Secret appears in the GET query string — the same exposure level as `localStorage`. Acceptable for this threat model. The store should not call `fetch` at module scope; only trigger inside `$effect()` in the consuming component.
 
@@ -781,13 +781,13 @@ F7-S1 (icons) can start anytime after F1-S1. F7-S2 needs the icons. F7-S3 needs 
 
 **Acceptance Criteria:**
 
-- [ ] Home screen displays a "Recent" section below the navigation buttons
-- [ ] Shows one summary row per log type (breast, bottle, nappy) — each row shows type emoji, key detail (side / amount consumed / poop+pee scale), relative time (e.g., "2h ago"), and which parent logged it
-- [ ] Relative time recalculates client-side without re-fetching
-- [ ] Uses `localStorage`-cached data for instant display on load; fetches updated data from the sheet in background
-- [ ] Shows a "No logs yet" placeholder when cache is empty and no fetch has completed
-- [ ] Shows a subtle loading indicator while the initial fetch is in flight
-- [ ] Data is shared across both parents' devices (sourced from the sheet, not per-device cache)
+- [x] Home screen displays a "Recent" section below the navigation buttons
+- [x] Shows one summary row per log type (breast, bottle, nappy) — each row shows type emoji, key detail (side / amount consumed / poop+pee scale), relative time (e.g., "2h ago"), and which parent logged it
+- [x] Relative time recalculates client-side without re-fetching
+- [x] Uses `localStorage`-cached data for instant display on load; fetches updated data from the sheet in background
+- [x] Shows a "No logs yet" placeholder when cache is empty and no fetch has completed
+- [x] Shows a subtle loading indicator while the initial fetch is in flight
+- [x] Data is shared across both parents' devices (sourced from the sheet, not per-device cache)
 
 **Technical Notes:** Trigger `latestStore.refresh()` in a `$effect` in `+page.svelte`. Extract a `LastActivity.svelte` component — props: `emoji`, `label`, `detail`, `time`, `user`. Use semantic design tokens (`text-ink-subtle`, `bg-surface-raised`, `border-edge`) per the visual design system. Relative time bands: `"just now"` (<1 min), `"Xm ago"` (<1h), `"Xh ago"` (<24h), `"yesterday"`.
 

@@ -2,6 +2,7 @@
 	import { base } from '$app/paths';
 	import UserToggle from '$lib/components/UserToggle.svelte';
 	import { configStore } from '$lib/stores/config.svelte';
+	import { latestStore } from '$lib/stores/latest.svelte';
 	import { themeStore } from '$lib/stores/theme.svelte';
 	import '../app.css';
 
@@ -14,6 +15,7 @@
 	$effect(() => {
 		configStore.init();
 		themeStore.init();
+		latestStore.init();
 	});
 </script>
 
